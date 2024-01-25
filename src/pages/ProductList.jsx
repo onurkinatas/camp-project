@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react'
-import {TableRow, TableHeaderCell, TableHeader, TableFooter, TableCell, TableBody, MenuItem, Icon, Label, Menu, Table,} from 'semantic-ui-react'
+import {TableRow, TableHeaderCell, TableHeader, TableFooter, TableCell, TableBody, MenuItem, Icon, Menu, Table, Button,} from 'semantic-ui-react'
 import ProductService from '../services/productService'
 import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { addToCart } from '../store/actions/cartActions'
+import { toast } from 'react-toastify'
 
 
 export default function ProductList() {
+
+  const dispatch = useDispatch()
 
   const [products, setProducts] = useState([])
 
@@ -12,6 +17,11 @@ export default function ProductList() {
     let productService = new ProductService()
     productService.getProducts().then(result => setProducts(result.data.products))
   }, [])
+
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product));
+    toast.success(`${product.title} Sepete eklendi!`)
+  };
   
   return (
     <div>
@@ -23,16 +33,20 @@ export default function ProductList() {
             <TableHeaderCell>Stok Adedi</TableHeaderCell>
             <TableHeaderCell>Açıklama</TableHeaderCell>
             <TableHeaderCell>Kategori</TableHeaderCell>
+            <TableHeaderCell></TableHeaderCell>
           </TableRow>
         </TableHeader>
     <TableBody>
       { products.map(product => (
-          <TableRow key = {product.id}>
+        <TableRow key = {product.id}>
           <TableCell><Link to = {`/products/${product.id}`}>{product.title}</Link></TableCell>
           <TableCell>{product.price}</TableCell>
           <TableCell>{product.stock}</TableCell>
           <TableCell>{product.description}</TableCell>
           <TableCell>{product.category}</TableCell>
+          <TableCell>
+            <Button onClick={() => handleAddToCart(product)}>Sepete Ekle</Button>
+          </TableCell>
         </TableRow>
         ))}   
     </TableBody>
